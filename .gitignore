@@ -1,0 +1,5 @@
+*.txt
+*.plot
+.settings/
+.project
+.classpath
