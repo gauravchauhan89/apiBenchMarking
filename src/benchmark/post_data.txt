@@ -1,0 +1,10 @@
+{
+ "msisdn": "{MSISDN}",
+ "latitude": "",
+ "longitude": "",
+ "siNumber": "{MSISDN}",
+ "deviceId": "{DEVICEID}",
+ "rechargeAmt":10.00,
+"lob":"prepaid",
+"TranId":"sampleTranID"
+}
