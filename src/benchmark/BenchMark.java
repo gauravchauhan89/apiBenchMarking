@@ -16,7 +16,8 @@ import org.apache.commons.lang3.text.StrBuilder;
 public class BenchMark {
 	//private static final String abCmd = "ab -n 100 -c 10 -g {DATA_FILENAME}.txt -p post_data.txt -T application/json -H \"x-forwarded-for: 171.48.0.1\" -H \"x-bsy-did: {DEVICE_ID}\" -H \"x-bsy-utkn: {UID}:{TOKEN}\" -H \"x-client: map\" {API_URL}";
 	private static final String gnuplotPath = "/opt/local/bin/gnuplot";
-	private static final String abMainCmd = "-n 50 -c 10 -T application/json";
+	private static final Integer TOTAL_REQUEST_COUNT = 50;
+	private static final Integer CONCURRENT_REQUEST_COUNT = 10;
 	private static Map<String, String> apiUrlMap = new HashMap<String, String>();
 	
 	static {
@@ -45,24 +46,33 @@ public class BenchMark {
 					String dataFileName = msisdn+"-"+apiInfo.getKey();
 					dataFileName = dataFileName.trim();
 					String apiUrl = apiInfo.getValue();
-					String[] cmd = new String[8];
+					String[] cmd = new String[11];
 					cmd[0] = "ab";
-					cmd[1] = abMainCmd;
-					cmd[2] = "-g"+dataFileName+".txt";
-					cmd[3] = "-H \"x-forwarded-for: 171.48.0.1\"";
-					cmd[4] = "-H \"x-client: map\"";
-					cmd[5] = "-H \"x-bsy-did: "+deviceId+"\"";
-					cmd[6] = "-H \"x-bsy-utkn: "+uId+":"+token+"\"";
-					cmd[7] = apiUrl;
+					cmd[1] = "-n "+TOTAL_REQUEST_COUNT.toString();
+					cmd[2] = "-c "+CONCURRENT_REQUEST_COUNT.toString();
+					cmd[3] = "-T application/json";
+					cmd[4] = "-g"+dataFileName+".txt";
+					cmd[5] = "-H \"x-forwarded-for: 171.48.0.1\"";
+					cmd[6] = "-H \"x-client: map\"";
+					cmd[7] = "-H \"x-bsy-did: "+deviceId+"\"";
+					cmd[8] = "-H \"x-bsy-utkn: "+uId+":"+token+"\"";
+					cmd[9] = "-v 4";
+					cmd[10] = apiUrl;
 					
 					Process p = Runtime.getRuntime().exec(cmd);
 					System.out.println(apiUrl+"\nProcessing ...");
 					
-					BufferedReader reader = 
+					BufferedReader outReader = 
+					         new BufferedReader(new InputStreamReader(p.getInputStream()));
+					BufferedReader errorReader = 
 					         new BufferedReader(new InputStreamReader(p.getErrorStream()));
 					String line1 = "";
-				    while ((line1 = reader.readLine())!= null) {
+				    while ((line1 = outReader.readLine())!= null) {
 				    		System.out.println(line1);
+				    }
+				    
+				    while ((line1 = errorReader.readLine())!= null) {
+			    		System.out.println(line1);
 				    }
 				    p.waitFor();
 				    
