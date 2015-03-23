@@ -62,6 +62,9 @@ public class BenchMark {
 					Process p = Runtime.getRuntime().exec(cmd);
 					System.out.println(apiUrl+"\nProcessing ...");
 					
+					FileWriter out_file_fw = new FileWriter( (new File("out/"+dataFileName+"_out.txt")).getAbsoluteFile( ) );
+					BufferedWriter out_file = new BufferedWriter(out_file_fw);
+					
 					BufferedReader outReader = 
 					         new BufferedReader(new InputStreamReader(p.getInputStream()));
 					BufferedReader errorReader = 
@@ -69,6 +72,7 @@ public class BenchMark {
 					String line1 = "";
 				    while ((line1 = outReader.readLine())!= null) {
 				    		System.out.println(line1);
+				    		out_file.write(line1+"\n");
 				    }
 				    
 				    while ((line1 = errorReader.readLine())!= null) {
@@ -90,13 +94,16 @@ public class BenchMark {
 				    Process gnuplot = Runtime.getRuntime().exec(gnuplotPath+" benchmark1.plot");
 				    gnuplot.waitFor();
 				    
+				    out_file.write("\n\nGraph\n");
 				    BufferedReader reader1 = 
 					         new BufferedReader(new InputStreamReader(gnuplot.getErrorStream()));
 					String line2 = "";
 				    while ((line2 = reader1.readLine())!= null) {
 				    		System.out.println(line2);
+				    		out_file.write(line2+"\n");
 				    }
 				    
+				    out_file.close();
 				    System.out.println("Done.");
 				}
 			}
